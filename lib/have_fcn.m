@@ -308,6 +308,7 @@ else        %% detect availability
             case 'ipopt'
                 TorF = exist('ipopt', 'file') == 3;
                 if TorF
+                  if have_fcn('evalc')
                     str = evalc('qps_ipopt([],[1; 1],[1 1],[2],[2],[1; 1],[1; 1],[1; 1],struct(''verbose'', 2))');
                     pat = 'Ipopt version ([^\s,]+)';
                     [s,e,tE,m,t] = regexp(str, pat);
@@ -319,6 +320,7 @@ else        %% detect availability
                             warning('Improper installation of IPOPT. Version %s detected, but IPOPT_AUXDATA.M is missing.', vstr);
                         end
                     end
+                  end
                 end
             case 'knitro'       %% any Knitro
                 tmp = have_fcn('knitromatlab', 'all');
@@ -444,7 +446,7 @@ else        %% detect availability
                     rdate = v.Date;
                 end
             case 'yalmip'
-                TorF = ~have_fcn('octave') && exist('yalmip','file') == 2;
+                TorF = exist('yalmip','file') == 2;
                 %% YALMIP does not yet work with Octave, rdz 1/6/14
                 if TorF
                     vstr = yalmip('version');
@@ -458,6 +460,7 @@ else        %% detect availability
             case 'sdpt3'
                 TorF = exist('sdpt3','file') == 2;
                 if TorF
+                  if have_fcn('evalc')
                     str = evalc('help sdpt3');
                     pat = 'version\s+([^\s]+).*Last Modified: ([^\n]+)\n';
                     [s,e,tE,m,t] = regexp(str, pat);
@@ -465,10 +468,12 @@ else        %% detect availability
                         vstr = t{1}{1};
                         rdate = datestr(t{1}{2}, 'dd-mmm-yyyy');
                     end
+                  end
                 end
             case 'sedumi'
                 TorF = exist('sedumi','file') == 2;
                 if TorF
+                  if have_fcn('evalc')
                     warn_state = warning;  %% sedumi turns (and leaves!) off all warnings
                     str = evalc('x = sedumi([1 1], 1, [1;2])');
                     warning(warn_state);
@@ -477,6 +482,7 @@ else        %% detect availability
                     if ~isempty(t)
                         vstr = t{1}{1};
                     end
+                  end
                 end
 
             %%-----  private tags  -----
@@ -496,10 +502,10 @@ else        %% detect availability
                 end
             case 'ipopt_auxdata'
                 if have_fcn('ipopt')
-                    vn = have_fcn('ipopt', 'vnum');
-                    if ~isempty(vn) && vn >= 3.011
+                    %vn = have_fcn('ipopt', 'vnum');
+                    %if ~isempty(vn) && vn >= 3.011
                         TorF = 1;
-                    end
+                    %end
                 end
             case 'lu_vec'       %% lu(..., 'vector') syntax supported?
                 if have_fcn('matlab') && have_fcn('matlab', 'vnum') < 7.003
